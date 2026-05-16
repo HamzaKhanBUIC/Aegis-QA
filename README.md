@@ -218,13 +218,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-**Project Maintainer:** [Your Name]
+**Project Maintainer:** [Hamza Imran]
 
-**Email:** [Your Email]
+**Email:** [hamza135252@gmail.com]
 
-**GitHub:** [@YourUsername](https://github.com/YourUsername)
+**GitHub:** [@HamzaKhanBUIC](https://github.com/HamzaKhanBUIC)
 
-**LinkedIn:** [Your LinkedIn](https://linkedin.com/in/yourprofile)
+**LinkedIn:** [Hamza Imran](www.linkedin.com/in/hamza-imran-17569b383)
 
 ---
 
