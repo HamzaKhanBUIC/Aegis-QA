@@ -6,6 +6,7 @@
 [![Powered by IBM Bob](https://img.shields.io/badge/Powered%20by-IBM%20Bob-0f62fe?style=for-the-badge)](https://www.ibm.com/bob)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Streamlit Live](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://aegis-app1.streamlit.app/)
 
 ---
 
@@ -159,9 +160,8 @@ Built entirely with **IBM Bob** during the IBM Bob Hackathon, Aegis-QA demonstra
 
 ### 📹 Demo & Links
 
-- **Video Pitch:** [Coming Soon - Add Your YouTube/Loom Link Here]
-- **Live Demo:** [Coming Soon - Add Your Deployed App Link Here]
-- **Hackathon Submission:** [Coming Soon - Add Your Submission Link Here]
+- **Live Demo:** [https://aegis-app1.streamlit.app/]
+- **Hackathon Submission:** [https://lablab.ai/ai-hackathons/ibm-bob-hackathon/agentic-innovation-node/aegis-qa-zero-touch-security-and-testing-swarm]
 
 ---
 
