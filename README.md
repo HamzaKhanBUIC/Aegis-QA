@@ -1,112 +1,70 @@
-# Aegis-QA: Multi-Agent Security Audit & Test Generation Swarm
+# Aegis-QA
 
-> Automated PyTest suite generation and static security vulnerability scanning powered by multi-agent orchestration and IBM watsonx.ai.
+> Paste a Python function and get a draft PyTest suite and a plain-language security review from IBM Granite (watsonx.ai), as a quick first pass before you write tests by hand.
 
-[![Live Streamlit](https://img.shields.io/badge/Live_App-aegis--app1.streamlit.app-FF4B4B.svg?logo=streamlit&logoColor=white)](https://aegis-app1.streamlit.app/)
-[![IBM watsonx.ai](https://img.shields.io/badge/Model-IBM_watsonx.ai-0F62FE.svg?logo=ibm)](https://www.ibm.com/watsonx)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python)](https://python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+**Status:** Hackathon prototype — IBM Bob Hackathon (lablab.ai), May 2026
+**Demo:** [Live app](https://aegis-app1.streamlit.app/) (Streamlit Community Cloud; it sleeps when idle, so the first load redirects through a wake-up page and takes a few seconds)
 
----
+## What it does
 
-## Overview
+`app.py` is a Streamlit page with a text box. When you click the button, `AegisSwarm.run_audit()` in `agent_core.py` sends your code to the watsonx.ai text-generation API (model `ibm/granite-3-8b-instruct`) in **two sequential prompts**:
 
-Software quality assurance and preliminary security auditing often require significant engineering overhead to construct comprehensive unit test coverage and identify OWASP Top 10 vulnerabilities.
-
-**Aegis-QA** automates this workflow using a multi-agent orchestration pipeline:
-1. **Source Code Ingestion**: Parses uploaded Python modules, AST structure, and function signatures.
-2. **Test Generation Agent**: Constructs isolated PyTest suites including parameterization, mock fixtures, and boundary cases.
-3. **Security Audit Agent**: Evaluates code against common vulnerability patterns (SQL injection, unsafe deserialization, insecure subprocess calls, credential exposure).
-4. **Interactive Dashboard**: Delivers generated test files and structured vulnerability reports via a Streamlit interface.
-
----
-
-## Architecture Flow
+1. a QA prompt that asks for a PyTest suite, shown in a code tab with a download button (`test_aegis.py`);
+2. a security prompt that asks for a Markdown vulnerability and documentation report, shown in a second tab with a download button (`aegis_report.md`).
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    participant U as Developer / Analyst
-    participant UI as Streamlit UI (`app.py`)
-    participant C as Coordinator Agent (`agent_core.py`)
-    participant TG as Test Generator Agent
-    participant SA as Security Auditor Agent
-    participant LLM as IBM watsonx.ai (Granite-3-8B)
-
-    U->>UI: Upload Python Source File
-    UI->>C: Pass Code AST and Metadata
-    par Parallel Agent Processing
-        C->>TG: Request PyTest Fixtures & Test Cases
-        TG->>LLM: Generate Unit Tests with Edge Cases
-        LLM-->>TG: Return Structured PyTest Module
-        
-        C->>SA: Request Static Vulnerability Audit
-        SA->>LLM: Scan for OWASP Top 10 & CWE Patterns
-        LLM-->>SA: Return Severity Matrix & Remediation Notes
-    end
-    TG-->>C: Formatted `test_module.py`
-    SA-->>C: Vulnerability Markdown Report
-    C->>UI: Render Live Split-Screen Cockpit
-    UI-->>U: Downloadable PyTest Suite & Security Audit
+    participant U as User
+    participant UI as app.py (Streamlit)
+    participant C as agent_core.py (AegisSwarm)
+    participant L as watsonx.ai (Granite-3-8B)
+    U->>UI: Paste Python code
+    UI->>C: run_audit(code)
+    C->>L: Prompt 1: generate PyTest suite
+    L-->>C: Test code
+    C->>L: Prompt 2: security and documentation report
+    L-->>C: Markdown report
+    C-->>UI: unit_tests, security_docs
+    UI-->>U: Two tabs with downloads
 ```
 
----
+## Quickstart
 
-## Core Capabilities
+Requires Python 3 and an IBM watsonx.ai API key and project ID. The repo does not declare a minimum Python version.
 
-- **Automated PyTest Generation**: Produces syntactically valid Python test files with parameterized cases and standard mock fixtures.
-- **OWASP Vulnerability Scanning**: Identifies security risks including injection vectors, unvalidated inputs, and insecure library usages.
-- **Multi-Agent Coordination**: Separates test synthesis and vulnerability analysis into dedicated agent roles to prevent context pollution.
-- **Streamlit Interactive Cockpit**: Enables file upload, real-time agent execution tracking, and single-click artifact export.
-
----
-
-## Repository Structure
-
-```
-.
-├── app.py                    # Streamlit web interface and session state
-├── agent_core.py             # Multi-agent coordination and watsonx.ai interface
-├── requirements.txt          # Python dependencies
-└── README.md
+```bash
+git clone https://github.com/HamzaKhanBUIC/Aegis-QA.git
+cd Aegis-QA
+pip install -r requirements.txt
 ```
 
----
+Create a `.env` file in the project root (see Configuration), then:
 
-## Getting Started
+```bash
+streamlit run app.py
+```
 
-### Prerequisites
-- Python 3.10 or higher
-- IBM watsonx.ai API credentials (or configured API key)
+Open `http://localhost:8501`. Without credentials the app shows `Swarm Failure: Missing Watsonx.ai credentials`.
 
-### Local Setup
+## Configuration
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/HamzaKhanBUIC/Aegis-QA.git
-   cd Aegis-QA
-   ```
+| Variable | Required | Purpose |
+| :-- | :-- | :-- |
+| `WATSONX_API_KEY` | yes | IBM Cloud API key, exchanged for an IAM token at `iam.cloud.ibm.com` |
+| `WATSONX_PROJECT_ID` | yes | watsonx.ai project used for text generation |
 
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+The endpoint (`us-south.ml.cloud.ibm.com`) and model ID are hard-coded in `agent_core.py`.
 
-3. **Configure environment variables**:
-   Create a `.env` file in the project root:
-   ```env
-   WATSONX_API_KEY=your_watsonx_api_key
-   WATSONX_PROJECT_ID=your_project_id
-   ```
+## Limitations
 
-4. **Start Streamlit application**:
-   ```bash
-   streamlit run app.py
-   ```
-   Open `http://localhost:8501` in your browser.
-
----
+- **Not a swarm.** There are no separate agents, coordinator or parallelism. The class name `AegisSwarm` and some UI text ("Swarm", "Agentic Nodes Active" in the sidebar) are leftover branding; the sidebar list is decorative text. The two model calls run one after the other.
+- **Not a static analyzer.** The code is not parsed (no AST or signature extraction); the raw text is placed into the prompt. The "security audit" is whatever Granite returns, so it can miss real issues and report false ones. Have a human review it.
+- **Generated tests are unchecked.** They are not executed or validated by the app.
+- **No tests or CI** in this repository.
+- `requirements.txt` is unpinned.
+- `bob_session/` holds transcripts and screenshots from building the app with IBM Bob; it is not used by the app.
+- The live demo depends on a watsonx.ai key held by the deployment and can stop working if that key lapses.
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+MIT, see [LICENSE](LICENSE).
